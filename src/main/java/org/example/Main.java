@@ -42,11 +42,11 @@ public class Main {
 
     public static void generateURLS(String filename) throws IOException {
         String file_counter = "counter.txt";
-        String file_urls = "urls.txt";
+//        String file_urls = "urls.txt";
 
         int counter = getCounter(file_counter);
         for (int basketID = 1; basketID <= 11; basketID++) {
-            for (int i = counter; i < 99999999; i += 100000) {
+            for (int i = counter; i < 99999999; i++) {
 
                 setCounter(file_counter, i);
 
@@ -56,11 +56,11 @@ public class Main {
                 System.out.println(counter_str);
                 if (isRealURL(result_str)) {
                     System.out.println(result_str);
-                    writeURL(result_str, file_urls);
+                    writeURL(result_str, String.format("urls_basket%02d.txt", basketID));
                 }
             }
         }
-        setCounter(file_counter, 101001);
+        setCounter(file_counter, 10001001);
     }
 
     public static int getCounter(String file) throws IOException {
@@ -81,7 +81,7 @@ public class Main {
     }
 
     public static void writeURL(String url, String file) throws IOException {
-        FileWriter fw = new FileWriter(file);
+        FileWriter fw = new FileWriter(file, true);
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write(url + "\n");
         bw.close();
