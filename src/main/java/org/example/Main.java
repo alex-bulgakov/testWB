@@ -1,7 +1,6 @@
 package org.example;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,8 +13,11 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
 //        String url = "https://basket-20.wb.ru/vol861/part86108/86108048/info/sellers.json";
-        ArrayList<String> urls = getListOfURLs();
 
+        try {
+            generateURLS("urls.txt");
+        } catch (IOException e) {
+        }
 
     }
 
@@ -39,23 +41,50 @@ public class Main {
     }
 
     public static void generateURLS(String filename) throws IOException {
+        String file_counter = "counter.txt";
+        String file_urls = "urls.txt";
 
-        FileWriter writer = new FileWriter(filename, true);
-
+        int counter = getCounter(file_counter);
         for (int basketID = 1; basketID <= 11; basketID++) {
-            for (int volID = 1; volID < 999; volID++) {
-                for (int partID = 1; partID < 99; partID++) {
-                    for (int subpartID = 1; subpartID < 999; subpartID++) {
-                        if ( isRealURL(String.format("https://basket-%02d.wb.ru/vol%03d/part%03d%02d/%03d%02d%03d/info/sellers.json",
-                                basketID, volID, volID, partID, volID, partID, subpartID))) {
-                            writer.write(url + "\n");
-                        }
-                    }
+            for (int i = counter; i < 99999999; i += 100000) {
 
+                setCounter(file_counter, i);
+
+                String counter_str = String.format("%08d", i);
+                String result_str = String.format("https://basket-%02d.wb.ru/vol%s/part%s/%s/info/sellers.json",
+                        basketID, counter_str.substring(0, 3), counter_str.substring(0, 5), counter_str);
+                System.out.println(counter_str);
+                if (isRealURL(result_str)) {
+                    System.out.println(result_str);
+                    writeURL(result_str, file_urls);
                 }
             }
         }
+        setCounter(file_counter, 101001);
+    }
 
-        writer.close();
+    public static int getCounter(String file) throws IOException {
+        FileReader fr = new FileReader(file);
+        BufferedReader bf = new BufferedReader(fr);
+        int counter = Integer.parseInt(bf.readLine());
+        bf.close();
+        fr.close();
+        return counter;
+    }
+
+    public static void setCounter(String file, int counter) throws IOException {
+        FileWriter fw = new FileWriter(file);
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(String.format("%08d", counter));
+        bw.close();
+        fw.close();
+    }
+
+    public static void writeURL(String url, String file) throws IOException {
+        FileWriter fw = new FileWriter(file);
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(url + "\n");
+        bw.close();
+        fw.close();
     }
 }
